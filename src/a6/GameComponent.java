@@ -204,7 +204,12 @@ public class GameComponent extends JPanel implements MouseListener {
         // Do not modify the `score` field directly; use `setScore`.
         // [1]:
         // https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/java/awt/event/MouseEvent.html
-
+        if(!isActive){
+            if(e.getX()!=target.x&&e.getY()!=target.y){
+                setScore(score++);
+            }
+        }
+        return;
     }
 
     // The remaining MouseListener event handlers are required to be present because of the
@@ -311,6 +316,14 @@ public class GameComponent extends JPanel implements MouseListener {
             // `throw` statement and replace it with your own implementation.
             // No Swing methods are needed, just high-school geometry.
             throw new RuntimeException("Unimplemented: checkHit");
+            if(cx <= x + radius && cx >= x - radius && cy <= y + radius && cy >= y - radius){
+           
+            //not complete do not know why not right.
+                
+                isHit=true;
+                return true;
+            }
+            return false;
         }
     }
 }
