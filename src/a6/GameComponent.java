@@ -107,7 +107,6 @@ public class GameComponent extends JPanel implements MouseListener {
         // TODO 5: Implement this method according to its specification.
         if(isActive){
             target.respawn(this.getWidth(),this.getHeight());
-            System.out.println(targetCount);
             if(targetCount++ >= maxTargets) isActive = false;
             repaint();
         }
@@ -188,6 +187,7 @@ public class GameComponent extends JPanel implements MouseListener {
         }
         else {
             target.paintDot(g);
+            repaint();
         }
     }
 
@@ -204,7 +204,14 @@ public class GameComponent extends JPanel implements MouseListener {
         // Do not modify the `score` field directly; use `setScore`.
         // [1]:
         // https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/java/awt/event/MouseEvent.html
-
+        if(isActive){
+            if(target.checkHit(e.getX(), e.getY())){
+//                setScore(score++); // this will not work ????
+                setScore(score+1);
+                System.out.println("score: "+ score);
+            }
+        }
+        return;
     }
 
     // The remaining MouseListener event handlers are required to be present because of the
@@ -270,8 +277,14 @@ public class GameComponent extends JPanel implements MouseListener {
             // https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/java/awt/Graphics.html
             // [2]:
             // https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/java/awt/Color.html
-            g.drawOval(x,y,radius,radius);
-            g.setColor(Color.BLUE);
+            if(!isHit){
+                g.setColor(Color.BLUE);
+                g.fillOval(x,y,radius,radius);
+            }
+            else{
+                g.setColor(Color.RED);
+                g.fillOval(x,y,radius,radius);
+            }
         }
 
         /**
@@ -310,7 +323,16 @@ public class GameComponent extends JPanel implements MouseListener {
             // TODO 7: Implement this method according to its specifications. Delete the
             // `throw` statement and replace it with your own implementation.
             // No Swing methods are needed, just high-school geometry.
-            throw new RuntimeException("Unimplemented: checkHit");
+            //throw new RuntimeException("Unimplemented: checkHit");
+            System.out.println("cx:" +cx + "cy:" + cy);
+            if(cx <= x + radius && cx >= x - radius && cy <= y + radius && cy >= y - radius){
+
+                //not complete do not know why not right.
+
+                isHit=true;
+                return true;
+            }
+            return false;
         }
     }
 }
