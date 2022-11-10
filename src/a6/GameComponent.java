@@ -324,10 +324,11 @@ public class GameComponent extends JPanel implements MouseListener {
             // `throw` statement and replace it with your own implementation.
             // No Swing methods are needed, just high-school geometry.
             //throw new RuntimeException("Unimplemented: checkHit");
-            System.out.println("cx:" +cx + "cy:" + cy);
+            //System.out.println("cx:" +cx + "cy:" + cy);
             if(cx <= x + radius && cx >= x - radius && cy <= y + radius && cy >= y - radius){
 
                 //not complete do not know why not right.
+                //This can work... but you have to change score++ to score+1 in TODO8, i dont know why...
 
                 isHit=true;
                 return true;
