@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Hashtable;
 
 import javax.swing.JButton;
@@ -15,6 +17,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * Main class for Click-a-Dot game. Creates window with game board, score label, start button, and
@@ -112,16 +116,36 @@ public class GameMain {
         // The label text should start with "Score: ", followed by the numerical
         // score.
 
+        game.addPropertyChangeListener("GameScore", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                scoreLabel.setText("Score: " + game.getScore());
+            }
+        });
+
         // When size slider is adjusted, update target radius in game.
         // TODO 10: Add a ChangeListener to `sizeSlider` that sets the game's
         // target radius to the slider's current value.
         // Method `JSlider.getValue()` gets the slider's current value.
         // [1]:
         // https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/swing/JSlider.html
+        sizeSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                game.setTargetRadius(sizeSlider.getValue());
+            }
+        });
 
         // When speed slider is adjusted, update target duration in game.
         // TODO 11: Add a ChangeListener to `speedSlider` that sets the game's
         // target duration to the slider's current value.
+        speedSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                game.setTargetTimeMillis(speedSlider.getValue());
+            }
+        });
+
 
         // When "Save" menu item is activated, open file dialog and append score
         // to chosen file.
@@ -164,7 +188,12 @@ public class GameMain {
         // for example code that you can adapt. Look under the heading "Customizing Labels on a
         // Slider".
         // [1] https://docs.oracle.com/javase/tutorial/uiswing/components/slider.html
-
+        JLabel jl_min = new JLabel(minLabel);
+        JLabel jl_max = new JLabel(maxLabel);
+        labels.put(slider.getMinimum(), jl_min);
+        labels.put(slider.getMaximum(), jl_max);
+        slider.setLabelTable(labels);
+        slider.setPaintLabels(true);
     }
 
     /**
