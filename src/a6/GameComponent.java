@@ -320,10 +320,10 @@ public class GameComponent extends JPanel implements MouseListener {
             //throw new RuntimeException("Unimplemented: checkHit");
             //System.out.println("cx:" +cx + "cy:" + cy);
             if(cx <= x + radius && cx >= x - radius && cy <= y + radius && cy >= y - radius){
-                //not complete do not know why not right.
-                //This can work... but you have to change score++ to score+1 in TODO8, i dont know why...
-                isHit=true;
-                return true;
+                if(isHit==false){
+                    isHit=true;
+                    return true;
+                }
             }
             return false;
         }
