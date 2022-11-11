@@ -1,20 +1,18 @@
 package a6;
 
-import java.awt.BorderLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
 import java.util.Hashtable;
 
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JSlider;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * Main class for Click-a-Dot game. Creates window with game board, score label, start button, and
@@ -94,7 +92,12 @@ public class GameMain {
         // You do not need to add the mnemonics, keyboard shortcuts, or hover over
         // descriptions shown in that tutorial.
         // [1] https://docs.oracle.com/javase/tutorial/uiswing/components/menu.html
-
+        JMenuBar b = new JMenuBar();
+        JMenu m= new JMenu("File");
+        m.add(saveItem);
+        m.add(exitItem);
+        b.add(m);
+        frame.setJMenuBar(b);
         ////////////////
         // Controller
         ////////////////
@@ -111,6 +114,7 @@ public class GameMain {
         // `scoreLabel`'s text whenever the "GameScore" property changes.
         // The label text should start with "Score: ", followed by the numerical
         // score.
+        game.addPropertyChangeListener("GameScore",e->scoreLabel.setText("Score: " + game.getScore()));
 
         // When size slider is adjusted, update target radius in game.
         // TODO 10: Add a ChangeListener to `sizeSlider` that sets the game's
@@ -118,10 +122,23 @@ public class GameMain {
         // Method `JSlider.getValue()` gets the slider's current value.
         // [1]:
         // https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/swing/JSlider.html
+        sizeSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                game.setTargetRadius(sizeSlider.getValue());
+            }
+        });
 
         // When speed slider is adjusted, update target duration in game.
         // TODO 11: Add a ChangeListener to `speedSlider` that sets the game's
         // target duration to the slider's current value.
+        speedSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                game.setTargetTimeMillis(speedSlider.getValue());
+            }
+        });
+
 
         // When "Save" menu item is activated, open file dialog and append score
         // to chosen file.
@@ -150,7 +167,7 @@ public class GameMain {
      * Label `slider`'s minimum value with `minLabel` and its maximum value with `maxLabel`.
      */
     private static void addSliderLabels(JSlider slider, String minLabel,
-            String maxLabel) {
+                                        String maxLabel) {
         Hashtable<Integer, JLabel> labels = new Hashtable<>();
         // TODO 12:
         // 1. Put a mapping in dictionary `labels`. The key for the mapping should be the slider's
@@ -164,7 +181,12 @@ public class GameMain {
         // for example code that you can adapt. Look under the heading "Customizing Labels on a
         // Slider".
         // [1] https://docs.oracle.com/javase/tutorial/uiswing/components/slider.html
-
+        JLabel jl_min = new JLabel(minLabel);
+        JLabel jl_max = new JLabel(maxLabel);
+        labels.put(slider.getMinimum(), jl_min);
+        labels.put(slider.getMaximum(), jl_max);
+        slider.setLabelTable(labels);
+        slider.setPaintLabels(true);
     }
 
     /**
@@ -189,7 +211,14 @@ public class GameMain {
         // [2]:
         // https://docs.oracle.com/en/java/javase/11/docs/api/java.desktop/javax/swing/BorderFactory.html
         // [3]: https://docs.oracle.com/javase/tutorial/uiswing/components/border.html
-        return slider;  // Replace this line with one that returns your panel
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(4,4,4,4));
+        JLabel topLabel = new JLabel(title, SwingConstants.CENTER);
+        topLabel.setFont(topLabel.getFont().deriveFont(16.0f));
+        panel.add(topLabel,BorderLayout.NORTH);
+
+        panel.add(slider);
+        return panel;  // Replace this line with one that returns your panel
     }
 
     /**
@@ -207,6 +236,18 @@ public class GameMain {
         // class of the exception and exception's message as its text [2].
         // [1] https://docs.oracle.com/javase/tutorial/uiswing/components/filechooser.html
         // [2] https://docs.oracle.com/javase/tutorial/uiswing/components/dialog.html
-
+        final JFileChooser fc= new JFileChooser();
+        int returnVal = fc.showSaveDialog(frame);
+        if(returnVal == JFileChooser.APPROVE_OPTION){
+            File file = fc.getSelectedFile();
+            try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)))) {
+                // Write data to file with `out.println()`
+                out.println(score);
+            } catch (IOException e) {
+                // Handle exception `e`
+                JOptionPane.showMessageDialog(frame,e.getClass().getSimpleName()+": "+file.getPath()
+                +" (Permission denied)", e.getClass().getSimpleName(), JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 }
